@@ -1,19 +1,21 @@
 import pandas as pd
 
-def load_data(movies_path,ratings_path):
+def load_data(movies_path,ratings_path,links_path):
     movies=pd.read_csv(movies_path)
     ratings=pd.read_csv(ratings_path)
-    return movies,ratings
+    links=pd.read_csv(links_path)
+
+    return movies,ratings,links
 
 
 def create_user_movie_matrix(ratings):
-    user_movie_matrix=ratings.pivot_table(
+    return ratings.pivot_table(
         index='userId',
         columns='movieId',
         values='rating'
     )
-    return user_movie_matrix
 
-
-def merge_movie_data(movies,ratings):
-    return pd.merge(ratings,movies,on='movieId')
+def merge_all(movies,ratings,links):
+    df=pd.merge(ratings,movies,on='movieId')
+    df=pd.merge(df,links,on='movieId')
+    return df
