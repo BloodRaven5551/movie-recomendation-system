@@ -5,9 +5,33 @@ from src.recommend import recommend_user, recommend_movie
 
 st.set_page_config(page_title="Movie Recommender", layout="wide")
 
-st.title("🎬 Movie Recommender System")
+st.markdown("""
+<style>
+.movie-card {
+    background-color: #1c1f26;
+    border-radius: 12px;
+    padding: 10px;
+    text-align: center;
+    transition: transform 0.2s ease;
+}
+.movie-card:hover {
+    transform: translateY(-5px);
+}
+.movie-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 8px;
+}
+.movie-genre {
+    font-size: 12px;
+    color: #9aa0a6;
+}
+</style>
+""", unsafe_allow_html=True)
 
-# ✅ Cache data
+st.title("🎬 Movie Recommendation System")
+
+
 @st.cache_data
 def load_all():
     return load_data(
@@ -24,39 +48,45 @@ def get_matrix(ratings):
 
 matrix = get_matrix(ratings)
 
-# Models
+
 cf = CollaborativeFiltering(matrix)
 cf.compute_similarity()
 
 cb = ContentBased(movies)
 cb.compute_similarity()
 
-mode = st.radio("Choose Mode:", ["User Based", "Movie Based"])
 
-# 🔹 USER BASED
-if mode == "User Based":
-    user_id = st.number_input("Enter User ID", min_value=1, max_value=610)
+search = st.text_input("🔍 Search movie (for movie-based recommendations)")
 
-    if st.button("Recommend"):
-        results = recommend_user(user_id, matrix, cf, movies, links)
+mode = st.radio("Choose Mode:", ["Movie Based", "User Based"])
 
-        cols = st.columns(5)
-        for i, (_, row) in enumerate(results.iterrows()):
-            with cols[i % 5]:
-                st.image(row['poster'])
-                st.write(row['title'])
-                st.caption(row['genres'])
+def show_movies(results):
+    cols = st.columns(5)
+    for i, (_, row) in enumerate(results.iterrows()):
+        with cols[i % 5]:
+            st.markdown('<div class="movie-card">', unsafe_allow_html=True)
+            if row['poster']:
+                st.image(row['poster'], use_container_width=True)
+            st.markdown(f"<div class='movie-title'>{row['title']}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='movie-genre'>{row['genres']}</div>", unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
 
-# 🔹 MOVIE BASED
-else:
-    movie = st.selectbox("Select Movie", movies['title'].values)
+
+if mode == "Movie Based":
+    movie_list = movies['title'].values
+
+    if search:
+        movie_list = [m for m in movie_list if search.lower() in m.lower()]
+
+    selected_movie = st.selectbox("Select Movie", movie_list)
 
     if st.button("Recommend Similar"):
-        results = recommend_movie(movie, cb, movies, links)
+        results = recommend_movie(selected_movie, cb, movies, links)
+        show_movies(results)
 
-        cols = st.columns(5)
-        for i, (_, row) in enumerate(results.iterrows()):
-            with cols[i % 5]:
-                st.image(row['poster'])
-                st.write(row['title'])
-                st.caption(row['genres'])
+else:
+    user_id = st.number_input("Enter User ID", min_value=1, max_value=610)
+
+    if st.button("Recommend for User"):
+        results = recommend_user(user_id, matrix, cf, movies, links)
+        show_movies(results)
