@@ -2,9 +2,8 @@ import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import CountVectorizer
 
-# 🔹 Collaborative Filtering
 class CollaborativeFiltering:
-    def __init__(self, matrix):
+    def _init_(self, matrix):
         self.matrix = matrix
         self.similarity = None
 
@@ -16,9 +15,8 @@ class CollaborativeFiltering:
         return np.argsort(scores)[::-1][1:top_n+1]
 
 
-# 🔹 Content-Based
 class ContentBased:
-    def __init__(self, movies):
+    def _init_(self, movies):
         self.movies = movies
         self.similarity = None
 
@@ -27,7 +25,7 @@ class ContentBased:
         vectors = cv.fit_transform(self.movies['genres'])
         self.similarity = cosine_similarity(vectors)
 
-    def recommend(self, title, n=5):
+    def recommend(self, title, n=10):
         idx = self.movies[self.movies['title'] == title].index[0]
         distances = list(enumerate(self.similarity[idx]))
         distances = sorted(distances, key=lambda x: x[1], reverse=True)[1:n+1]
