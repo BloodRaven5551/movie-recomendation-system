@@ -2,7 +2,7 @@ import pandas as pd
 from src.utils import fetch_poster
 
 
-def recommend_user(user_id, matrix, model, movies, links, n=5):
+def recommend_user(user_id, matrix, model, movies, links, n=10):
     users = model.get_similar_users(user_id)
     scores = {}
 
@@ -22,7 +22,7 @@ def recommend_user(user_id, matrix, model, movies, links, n=5):
     return result[['title', 'genres', 'poster']]
 
 
-def recommend_movie(title, cb_model, movies, links, n=5):
+def recommend_movie(title, cb_model, movies, links, n=10):
     recs = cb_model.recommend(title, n)
     recs = pd.merge(recs, links, on='movieId')
     recs['poster'] = recs['tmdbId'].apply(fetch_poster)
