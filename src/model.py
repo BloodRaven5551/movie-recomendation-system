@@ -2,8 +2,9 @@ import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import CountVectorizer
 
+
 class CollaborativeFiltering:
-    def _init_(self, matrix):
+    def __init__(self, matrix):   # ✅ REQUIRED
         self.matrix = matrix
         self.similarity = None
 
@@ -16,7 +17,7 @@ class CollaborativeFiltering:
 
 
 class ContentBased:
-    def _init_(self, movies):
+    def __init__(self, movies):
         self.movies = movies
         self.similarity = None
 
