@@ -1,6 +1,6 @@
 import requests
 
-API_KEY="YOUR_TMDB_API_KEY"
+API_KEY="39276e2761db2a5dfca927607dd76ed3"
 
 def fetch_poster(tmdb_id):
     if tmdb_id!=tmdb_id:
