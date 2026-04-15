@@ -4,7 +4,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 
 
 class CollaborativeFiltering:
-    def __init__(self, matrix):   # ✅ REQUIRED
+    def __init__(self, matrix):   
         self.matrix = matrix
         self.similarity = None
 
