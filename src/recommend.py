@@ -28,3 +28,7 @@ def recommend_movie(title, cb_model, movies, links, n=10):
     recs['poster'] = recs['tmdbId'].apply(fetch_poster)
 
     return recs[['title', 'genres', 'poster']]
+
+def hybrid_score(cf_score, cb_score, svd_score,
+                 w1=0.4, w2=0.3, w3=0.3):
+    return (w1 * cf_score) + (w2 * cb_score) + (w3 * svd_score)

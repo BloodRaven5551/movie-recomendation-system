@@ -1,6 +1,6 @@
 pandas
 numpy
 scikit-learn
-scipy
 streamlit
 requests
+scikit-surprise
