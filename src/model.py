@@ -3,9 +3,7 @@ import pandas as pd
 
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
-
-from surprise import SVD, Dataset, Reader
-from surprise.model_selection import train_test_split
+from sklearn.decomposition import TruncatedSVD
 
 
 # -------------------- COLLABORATIVE FILTERING --------------------
@@ -22,7 +20,7 @@ class CollaborativeFiltering:
         return np.argsort(scores)[::-1][1:top_n+1]
 
 
-# -------------------- CONTENT BASED (TF-IDF UPDATED) --------------------
+# -------------------- CONTENT BASED --------------------
 class ContentBased:
     def __init__(self, movies):
         self.movies = movies
@@ -44,24 +42,20 @@ class ContentBased:
         return self.movies.iloc[indices]
 
 
-# -------------------- SVD MODEL (NEW) --------------------
+# -------------------- SVD MODEL --------------------
 class SVDRecommender:
-    def __init__(self, ratings):
-        self.ratings = ratings
-        self.model = None
+    def __init__(self, matrix, n_components=50):
+        self.matrix = matrix.fillna(0)
+        self.model = TruncatedSVD(n_components=n_components)
+        self.user_factors = None
+        self.item_factors = None
 
     def train(self):
-        reader = Reader(rating_scale=(1, 5))
-
-        data = Dataset.load_from_df(
-            self.ratings[['userId', 'movieId', 'rating']],
-            reader
-        )
-
-        trainset, _ = train_test_split(data, test_size=0.2)
-
-        self.model = SVD()
-        self.model.fit(trainset)
+        self.user_factors = self.model.fit_transform(self.matrix)
+        self.item_factors = self.model.components_
 
     def predict(self, user_id, movie_id):
-        return self.model.predict(user_id, movie_id).est
+        return np.dot(
+            self.user_factors[user_id - 1],
+            self.item_factors[:, movie_id - 1]
+        )

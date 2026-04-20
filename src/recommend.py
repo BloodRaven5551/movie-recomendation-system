@@ -19,7 +19,7 @@ def recommend_user(user_id, matrix, model, movies, links, n=10):
     result = pd.merge(result, links, on='movieId')
     result['poster'] = result['tmdbId'].apply(fetch_poster)
 
-    return result[['title', 'genres', 'poster']]
+    return result[['movieId', 'title', 'genres', 'poster']]
 
 
 def recommend_movie(title, cb_model, movies, links, n=10):
